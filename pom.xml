@@ -49,6 +49,20 @@
             <scope>provided</scope>
         </dependency>
 
+        <!-- Kafka Streams -->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-streams</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+        <!-- Kafka Clients-->
+        <dependency>
+            <groupId>org.apache.kafka</groupId>
+            <artifactId>kafka-clients</artifactId>
+            <version>1.0.2</version>
+        </dependency>
+
     </dependencies>
 
     <properties>

@@ -20,7 +20,7 @@ public class IdRegistrationService {
     public void listen(@Payload String id, @Headers Map<String, Object> headers) {
 
         System.out.println("\n~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-        System.out.println("{threadName: " + Thread.currentThread().getName() + "}Received id: " + id);
+        System.out.println("{threadName: " + Thread.currentThread().getName() + "}Received _id: " + id);
         System.out.println("{headers: " + headers + "}");
 
         ids.add(id);
