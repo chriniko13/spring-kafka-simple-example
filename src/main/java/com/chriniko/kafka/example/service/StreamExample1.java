@@ -5,13 +5,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.Serdes;
-import org.apache.kafka.streams.Consumed;
-import org.apache.kafka.streams.KafkaStreams;
-import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.*;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.KeyValueMapper;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.Serialized;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -78,17 +76,15 @@ public class StreamExample1 {
                 PEOPLE_TOPIC,
                 Consumed.with(Serdes.String(), new JsonSerde<>(Person.class, objectMapper)));
 
-        source.foreach((key, value) -> System.out.println("\n ~~~" + key + " --- " + value.getName()));
 
-//        KTable<Integer, Long> peopleGroupedByAgeCount = source
-//                .groupBy((key, value) -> value.getAge())
-//                .count();
-
-
-        // need to override value serde to Long type
-//        peopleGroupedByAgeCount
-//                .toStream()
-//                .to(PEOPLE_GROUPED_BY_AGES_COUNT, Produced.with(Serdes.Integer(), Serdes.Long()));
+        source.groupBy((key, value) -> value.getAge(), Serialized.with(Serdes.Integer(), new JsonSerde<>(Person.class, objectMapper)))
+                .count()
+                .toStream()
+                .map((KeyValueMapper<Integer, Long, KeyValue<Integer, Long>>) (key, value) -> {
+                    System.out.println("age: " + key + " --- count: " + value);
+                    return KeyValue.pair(key, value);
+                })
+                .to(PEOPLE_GROUPED_BY_AGES_COUNT, Produced.with(Serdes.Integer(), Serdes.Long()));
 
 
         streams = new KafkaStreams(builder.build(), streamsConfiguration);
@@ -100,7 +96,6 @@ public class StreamExample1 {
         });
         streams.cleanUp();
         streams.start();
-
 
         TimeUnit.SECONDS.sleep(60);
     }

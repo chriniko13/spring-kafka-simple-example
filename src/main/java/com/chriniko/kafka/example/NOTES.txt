@@ -2,7 +2,7 @@
         NOTES
 =================================================
 
-0) Topic names which this example uses: {students, studentsJson}
+0) Topic names which this example uses: {students, studentsJson, people, people-ages-count}
 
 
 1) Start kafka server:
